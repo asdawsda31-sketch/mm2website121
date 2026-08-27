@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Login — STATUS HUB</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg: #03040a;
+      --ice-100: #eaf2ff;
+      --ice-200: #b9ccff;
+      --ice-300: #7fa4f5;
+      --ice-400: #5a86e6;
+      --ice-500: #3d63c4;
+      --ice-600: #25408c;
+      --glass: rgba(255,255,255,0.025);
+      --glass-strong: rgba(255,255,255,0.04);
+      --glass-hover: rgba(255,255,255,0.055);
+      --line: rgba(180, 200, 255, 0.06);
+      --line-2: rgba(180, 200, 255, 0.11);
+      --line-3: rgba(180, 200, 255, 0.18);
+      --text: #e7ecf7;
+      --text-2: #8a93ad;
+      --text-3: #535b78;
+      --accent: #7fa4f5;
+      --accent-glow: rgba(127, 164, 245, 0.35);
+      --green: #22e07a;
+      --money: #a3e635;
+      --blue: #2bb8ff;
+      --purple: #9b7bff;
+      --orange: #ff8a3d;
+    }
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{margin:0;padding:0;background:var(--bg);color:var(--text);
+      font-family:'Inter',ui-sans-serif,system-ui,-apple-system,sans-serif;
+      -webkit-font-smoothing:antialiased;
+      min-height:100vh;
+      display:flex;align-items:center;justify-content:center;
+      overflow:hidden;
+      background-image:
+        radial-gradient(1000px 700px at 16% -8%, rgba(61, 99, 196, 0.18), transparent 62%),
+        radial-gradient(800px 600px at 94% 4%, rgba(90, 134, 230, 0.10), transparent 58%),
+        radial-gradient(900px 700px at 78% 96%, rgba(37, 64, 140, 0.16), transparent 64%);
+      background-attachment: fixed;
+    }
+    ::selection{background:rgba(127,164,245,.25)}
+    a{color:inherit;text-decoration:none}
+    .backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      overflow: hidden;
+    }
+    .backdrop__aurora {
+      position: absolute;
+      inset: -40%;
+      background:
+        radial-gradient(ellipse 70% 50% at 25% 35%, rgba(155,123,255,0.10) 0%, transparent 55%),
+        radial-gradient(ellipse 50% 70% at 75% 65%, rgba(90, 24, 154, 0.07) 0%, transparent 55%);
+      animation: drift 25s ease-in-out infinite alternate;
+    }
+    @keyframes drift {
+      0%   { transform: translate(0, 0) scale(1); }
+      50%  { transform: translate(25px, -18px) scale(1.02); }
+      100% { transform: translate(-15px, 12px) scale(0.98); }
+    }
+    .backdrop__grid {
+      position: absolute;
+      inset: 0;
+      background-image:
+        repeating-linear-gradient(45deg, 
+          transparent 0px, 
+          transparent 40px, 
+          rgba(155,123,255,0.025) 40px, 
+          rgba(155,123,255,0.025) 41px,
+          transparent 41px,
+          transparent 80px
+        ),
+        repeating-linear-gradient(-45deg, 
+          transparent 0px, 
+          transparent 40px, 
+          rgba(127,164,245,0.018) 40px, 
+          rgba(127,164,245,0.018) 41px,
+          transparent 41px,
+          transparent 80px
+        );
+      mask-image: radial-gradient(ellipse 60% 60% at 50% 50%, black, transparent);
+      -webkit-mask-image: radial-gradient(ellipse 60% 60% at 50% 50%, black, transparent);
+    }
+    .backdrop__noise {
+      position: absolute;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
+      opacity: 0.6;
+    }
+    .backdrop__katana {
+      position: absolute;
+      right: -60px;
+      bottom: -80px;
+      z-index: 1;
+      font-size: 280px;
+      line-height: 1;
+      color: var(--purple);
+      opacity: 0.06;
+      pointer-events: none;
+      font-family: 'Inter', sans-serif;
+      transform: rotate(6deg);
+    }
+    .login-wrap {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 28px;
+      width: 100%;
+      max-width: 420px;
+      padding: 0 24px;
+      animation: up 0.6s ease both;
+    }
+    .login-brand {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 14px;
+    }
+    .login-brand__icon {
+      width: 52px;
+      height: 52px;
+      border-radius: 14px;
+      overflow: hidden;
+      flex-shrink: 0;
+      display: grid;
+      place-items: center;
+      background: rgba(155,123,255,0.08);
+      border: 1px solid rgba(155,123,255,0.20);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.06), 0 0 30px rgba(155,123,255,0.12);
+    }
+    .login-brand__icon img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    .login-brand__icon .fallback {
+      color: var(--purple);
+      font-size: 24px;
+    }
+    .login-brand__title {
+      font-family: 'Inter', sans-serif;
+      font-weight: 800;
+      font-size: clamp(48px, 10vw, 68px);
+      letter-spacing: -0.02em;
+      line-height: 0.9;
+      text-align: center;
+      background: linear-gradient(180deg, #fff 20%, var(--ice-200) 50%, var(--purple) 80%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      text-shadow: 0 20px 70px rgba(155,123,255,0.20);
+    }
+    .login-brand__title .hl {
+      background: none;
+      -webkit-text-fill-color: var(--text-3);
+      font-weight: 300;
+    }
+    .card {
+      position: relative;
+      overflow: hidden;
+      border-radius: 18px;
+      border: 1px solid var(--line-2);
+      background:
+        radial-gradient(circle at 10% 3%, rgba(155,123,255,0.06), transparent 15rem),
+        radial-gradient(circle at 95% 0%, rgba(127,164,245,0.03), transparent 18rem),
+        linear-gradient(180deg, rgba(255,255,255,0.018), rgba(255,255,255,0.005));
+      backdrop-filter: blur(18px) saturate(140%);
+      -webkit-backdrop-filter: blur(18px) saturate(140%);
+      box-shadow: inset 0 1px rgba(255,255,255,0.035), 0 18px 46px rgba(0, 0, 0, 0.3);
+    }
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, rgba(155,123,255,0.20), transparent 70%);
+      opacity: 0.5;
+      pointer-events: none;
+    }
+    .card .katana-pattern {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      background-image:
+        repeating-linear-gradient(45deg, 
+          transparent 0px, 
+          transparent 60px, 
+          rgba(155,123,255,0.015) 60px, 
+          rgba(155,123,255,0.015) 61px,
+          transparent 61px,
+          transparent 120px
+        ),
+        repeating-linear-gradient(-45deg, 
+          transparent 0px, 
+          transparent 60px, 
+          rgba(127,164,245,0.01) 60px, 
+          rgba(127,164,245,0.01) 61px,
+          transparent 61px,
+          transparent 120px
+        );
+      opacity: 0.4;
+    }
+    .login-card {
+      width: 100%;
+      padding: 36px 32px;
+      text-align: center;
+      position: relative;
+      z-index: 1;
+    }
+    .login-card > * { position: relative; z-index: 1; }
+    .login-card__heading {
+      font-family: 'Inter', sans-serif;
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 6px;
+      color: var(--text);
+    }
+    .login-card__sub {
+      font-family: 'Inter', sans-serif;
+      font-size: 13px;
+      color: var(--text-2);
+      margin-bottom: 28px;
+      line-height: 1.6;
+      font-weight: 400;
+    }
+    .discord-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      width: 100%;
+      padding: 16px 32px;
+      background: linear-gradient(135deg, var(--purple), var(--ice-400));
+      border: 1px solid rgba(155,123,255,0.4);
+      border-radius: 14px;
+      color: #fff;
+      font-family: 'Inter', sans-serif;
+      font-size: 15px;
+      font-weight: 600;
+      letter-spacing: 0.3px;
+      text-decoration: none;
+      cursor: pointer;
+      transition: all 0.25s;
+      box-shadow: 0 4px 24px rgba(155,123,255,0.30), inset 0 1px 0 rgba(255,255,255,0.10);
+      position: relative;
+      overflow: hidden;
+    }
+    .discord-btn::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(105deg, transparent 28%, rgba(255,255,255,.18) 50%, transparent 72%);
+      transform: translateX(-140%);
+      transition: transform .55s ease;
+      pointer-events: none;
+    }
+    .discord-btn:hover::after { transform: translateX(140%); }
+    .discord-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 36px rgba(155,123,255,0.50), inset 0 1px 0 rgba(255,255,255,0.10);
+    }
+    .discord-btn:active { transform: scale(0.965); transition-duration: .07s; }
+    .discord-btn svg { width: 22px; height: 22px; flex-shrink: 0; }
+    .login-footer {
+      font-family: 'Inter', sans-serif;
+      font-size: 12px;
+      color: var(--text-3);
+      font-weight: 400;
+      letter-spacing: 0.02em;
+    }
+    .login-footer .hl {
+      background: linear-gradient(135deg, var(--ice-200), var(--purple));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      font-weight: 700;
+    }
+    @keyframes up {
+      from { opacity: 0; transform: translateY(18px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @media (max-width: 480px) {
+      .login-wrap { padding: 0 16px; }
+      .login-card { padding: 28px 20px; }
+      .login-brand__title { font-size: 42px; }
+      .backdrop__katana { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="backdrop">
+    <div class="backdrop__aurora"></div>
+    <div class="backdrop__grid"></div>
+    <div class="backdrop__noise"></div>
+    <div class="backdrop__katana">⚔</div>
+  </div>
+  <div class="login-wrap">
+    <div class="login-brand">
+      <div class="login-brand__icon">
+        <img src="https://cdn.discordapp.com/attachments/1539374998387556482/1539392517299245066/statushublogo.png?ex=6a88c980&is=6a877800&hm=5291d9201b2c106b0e8e4812c4d2c406e04b0b72cceccf3c13184fb6f28fbdb1" alt="STATUS HUB Logo" onerror="this.style.display='none';this.parentElement.innerHTML='<span class=fallback>⚡</span>'">
+      </div>
+      <div class="login-brand__title">
+        STATUS <span class="hl">HUB</span>
+      </div>
+    </div>
+    <div class="card login-card">
+      <div class="katana-pattern"></div>
+      <div class="login-card__heading">Welcome back</div>
+      <div class="login-card__sub">Sign in with your Discord account to access the dashboard.</div>
+      <a href="https://discord.gg/statushub" class="discord-btn">
+        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="#ffffff">
+          <path d="M19.27 5.33A16.5 16.5 0 0 0 15.2 4l-.2.4a12.5 12.5 0 0 1 3.6 1.84 14 14 0 0 0-12.2 0A12.5 12.5 0 0 1 10 4.4L9.8 4a16.5 16.5 0 0 0-4.07 1.33C3.13 9.2 2.42 12.98 2.77 16.7a16.6 16.6 0 0 0 5.05 2.55l.6-.97a10.8 10.8 0 0 1-1.7-.82l.42-.32a11.9 11.9 0 0 0 10.13 0l.42.32c-.54.32-1.11.6-1.7.82l.6.97a16.6 16.6 0 0 0 5.05-2.55c.42-4.32-.7-8.07-2.9-11.37zM9.18 14.53c-.97 0-1.77-.9-1.77-2s.78-2.01 1.77-2.01 1.78.9 1.77 2.01c0 1.1-.78 2-1.77 2zm5.64 0c-.97 0-1.77-.9-1.77-2s.78-2.01 1.77-2.01 1.78.9 1.77 2.01c0 1.1-.78 2-1.77 2z"/>
+        </svg>
+        Login with Discord
+      </a>
+    </div>
+    <p class="login-footer"><span class="hl">STATUS HUB</span> — clearly better &lt;3</p>
+  </div>
+</body>
+</html>

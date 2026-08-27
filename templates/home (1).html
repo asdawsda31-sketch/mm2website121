@@ -1,0 +1,1124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Dashboard — STATUS HUB</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+
+  <script src="https://unpkg.com/lucide@0.460.0"></script>
+
+  <style>
+    :root{
+      --bg: #03040a;
+
+      --ice-100: #eaf2ff;
+      --ice-200: #b9ccff;
+      --ice-300: #7fa4f5;
+      --ice-400: #5a86e6;
+      --ice-500: #3d63c4;
+      --ice-600: #25408c;
+
+      --glass:        rgba(255,255,255,0.025);
+      --glass-strong: rgba(255,255,255,0.04);
+      --glass-hover:  rgba(255,255,255,0.055);
+      --line:         rgba(180, 200, 255, 0.06);
+      --line-2:       rgba(180, 200, 255, 0.11);
+      --line-3:       rgba(180, 200, 255, 0.18);
+
+      --text:   #e7ecf7;
+      --text-2: #8a93ad;
+      --text-3: #535b78;
+
+      --accent: #7fa4f5;
+      --accent-glow: rgba(127, 164, 245, 0.35);
+
+      --green:  #22e07a;
+      --money:  #a3e635;
+      --blue:   #2bb8ff;
+      --purple: #9b7bff;
+      --orange: #ff8a3d;
+
+      --sidebar-w: 256px;
+      --header-h: 60px;
+      --m: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{margin:0;padding:0;background:var(--bg);color:var(--text);
+      font-family:'Inter',ui-sans-serif,system-ui,-apple-system,sans-serif;
+      -webkit-font-smoothing:antialiased;
+      min-height:100vh;
+      overflow-x:hidden;
+      display:flex;
+      background-image:
+        radial-gradient(1000px 700px at 16% -8%, rgba(61, 99, 196, 0.18), transparent 62%),
+        radial-gradient(800px 600px at 94% 4%,  rgba(90, 134, 230, 0.10), transparent 58%),
+        radial-gradient(900px 700px at 78% 96%, rgba(37, 64, 140, 0.16), transparent 64%);
+      background-attachment: fixed;
+    }
+    ::selection{background:rgba(127,164,245,.25)}
+    a{color:inherit;text-decoration:none}
+
+    .lucide { width: 1.1em; height: 1.1em; stroke-width: 2; }
+
+    .backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      overflow: hidden;
+    }
+
+    .backdrop__aurora {
+      position: absolute;
+      inset: -40%;
+      background:
+        radial-gradient(ellipse 70% 50% at 25% 35%, rgba(155,123,255,0.08) 0%, transparent 55%),
+        radial-gradient(ellipse 50% 70% at 75% 65%, rgba(90, 24, 154, 0.06) 0%, transparent 55%);
+      animation: drift 25s ease-in-out infinite alternate;
+    }
+
+    @keyframes drift {
+      0%   { transform: translate(0, 0) scale(1); }
+      50%  { transform: translate(20px, -15px) scale(1.01); }
+      100% { transform: translate(-10px, 10px) scale(0.99); }
+    }
+
+    .backdrop__grid {
+      position: absolute;
+      inset: 0;
+      background-image:
+        repeating-linear-gradient(45deg, 
+          transparent 0px, 
+          transparent 40px, 
+          rgba(155,123,255,0.025) 40px, 
+          rgba(155,123,255,0.025) 41px,
+          transparent 41px,
+          transparent 80px
+        ),
+        repeating-linear-gradient(-45deg, 
+          transparent 0px, 
+          transparent 40px, 
+          rgba(127,164,245,0.018) 40px, 
+          rgba(127,164,245,0.018) 41px,
+          transparent 41px,
+          transparent 80px
+        );
+      mask-image: radial-gradient(ellipse 60% 60% at 50% 50%, black, transparent);
+      -webkit-mask-image: radial-gradient(ellipse 60% 60% at 50% 50%, black, transparent);
+    }
+
+    .backdrop__noise {
+      position: absolute;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
+      opacity: 0.6;
+    }
+
+    .backdrop__katana {
+      position: absolute;
+      right: -60px;
+      bottom: -80px;
+      z-index: 1;
+      font-size: 280px;
+      line-height: 1;
+      color: var(--purple);
+      opacity: 0.05;
+      pointer-events: none;
+      font-family: 'Inter', sans-serif;
+      transform: rotate(6deg);
+    }
+
+    .card {
+      position: relative;
+      overflow: hidden;
+      border-radius: 16px;
+      border: 1px solid var(--line-2);
+      background:
+        radial-gradient(circle at 10% 3%, rgba(155,123,255,0.04), transparent 15rem),
+        radial-gradient(circle at 95% 0%, rgba(127,164,245,0.02), transparent 18rem),
+        linear-gradient(180deg, rgba(255,255,255,0.018), rgba(255,255,255,0.005));
+      backdrop-filter: blur(18px) saturate(140%);
+      -webkit-backdrop-filter: blur(18px) saturate(140%);
+      box-shadow: inset 0 1px rgba(255,255,255,0.035), 0 12px 36px rgba(0, 0, 0, 0.25);
+      transition: border-color var(--m), transform var(--m);
+    }
+
+    .card:hover { border-color: var(--line-3); }
+
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, rgba(155,123,255,0.20), transparent 70%);
+      opacity: 0.4;
+      pointer-events: none;
+    }
+
+    .card .katana-pattern {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      background-image:
+        repeating-linear-gradient(45deg, 
+          transparent 0px, 
+          transparent 60px, 
+          rgba(155,123,255,0.015) 60px, 
+          rgba(155,123,255,0.015) 61px,
+          transparent 61px,
+          transparent 120px
+        ),
+        repeating-linear-gradient(-45deg, 
+          transparent 0px, 
+          transparent 60px, 
+          rgba(127,164,245,0.01) 60px, 
+          rgba(127,164,245,0.01) 61px,
+          transparent 61px,
+          transparent 120px
+        );
+      opacity: 0.4;
+    }
+
+    .card > * { position: relative; z-index: 1; }
+
+    .sidebar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      width: var(--sidebar-w);
+      z-index: 100;
+      background: rgba(3, 4, 10, 0.82);
+      backdrop-filter: blur(20px) saturate(1.3);
+      -webkit-backdrop-filter: blur(20px) saturate(1.3);
+      border-right: 1px solid var(--line);
+      display: flex;
+      flex-direction: column;
+      padding: 20px 14px;
+    }
+
+    .sidebar__logo {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      padding: 0 14px 24px;
+      margin-bottom: 6px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .sidebar__logo-icon {
+      width: 34px;
+      height: 34px;
+      border-radius: 10px;
+      display: grid;
+      place-items: center;
+      background: rgba(155,123,255,0.08);
+      border: 1px solid rgba(155,123,255,0.18);
+      color: var(--purple);
+      flex-shrink: 0;
+      box-shadow: 0 0 20px rgba(155,123,255,0.08);
+    }
+
+    .sidebar__logo-icon svg { width: 16px; height: 16px; }
+
+    .sidebar__logo-text {
+      font-family: 'Inter', sans-serif;
+      font-weight: 800;
+      font-size: 17px;
+      letter-spacing: 1.5px;
+      background: linear-gradient(135deg, var(--ice-200), var(--purple));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .sidebar__logo-text .hl { background: none; -webkit-text-fill-color: var(--text-3); font-weight: 300; }
+
+    .sidebar__nav {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      padding: 6px 0;
+    }
+
+    .sidebar__link {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      padding: 11px 14px;
+      border-radius: 11px;
+      font-family: 'Inter', sans-serif;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-3);
+      background: transparent;
+      border: 1px solid transparent;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-decoration: none;
+    }
+
+    .sidebar__link:hover {
+      color: var(--text-2);
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    .sidebar__link.active {
+      color: var(--purple);
+      background: rgba(155,123,255,0.08);
+      border-color: rgba(155,123,255,0.18);
+      box-shadow: 0 0 20px rgba(155,123,255,0.06);
+    }
+
+    .sidebar__link i { width: 17px; height: 17px; }
+
+    .sidebar__user {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      padding: 12px 14px;
+      border-radius: 14px;
+      background: rgba(13, 17, 23, 0.5);
+      border: 1px solid var(--line);
+      margin-top: auto;
+    }
+
+    .sidebar__user-avatar {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      border: 2px solid rgba(155,123,255,0.25);
+      flex-shrink: 0;
+    }
+
+    .sidebar__user-info { min-width: 0; flex: 1; }
+
+    .sidebar__user-name {
+      font-family: 'Inter', sans-serif;
+      font-size: 13px;
+      font-weight: 700;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .sidebar__user-tag {
+      font-family: 'Inter', sans-serif;
+      font-size: 11px;
+      color: var(--text-3);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .sidebar__logout {
+      width: 30px;
+      height: 30px;
+      border-radius: 8px;
+      border: none;
+      background: transparent;
+      color: var(--text-3);
+      display: grid;
+      place-items: center;
+      cursor: pointer;
+      transition: all 0.2s;
+      flex-shrink: 0;
+    }
+
+    .sidebar__logout:hover {
+      color: var(--orange);
+      background: rgba(255, 138, 61, 0.08);
+    }
+
+    .main {
+      margin-left: var(--sidebar-w);
+      flex: 1;
+      position: relative;
+      z-index: 1;
+      min-height: 100vh;
+    }
+
+    .topbar {
+      height: var(--header-h);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 36px;
+      border-bottom: 1px solid var(--line);
+      background: rgba(3, 4, 10, 0.5);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+
+    .topbar__title {
+      font-family: 'Inter', sans-serif;
+      font-size: 17px;
+      font-weight: 700;
+      letter-spacing: -0.3px;
+    }
+
+    .topbar__desc {
+      font-family: 'Inter', sans-serif;
+      font-size: 12px;
+      color: var(--text-3);
+      margin-top: 1px;
+    }
+
+    .workspace {
+      padding: 28px 36px;
+      max-width: 1200px;
+    }
+
+    .tab-panel { display: none; }
+
+    .tab-panel.active {
+      display: block;
+      animation: panelIn 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+    }
+
+    @keyframes panelIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .dash-grid {
+      display: grid;
+      grid-template-columns: 1fr 300px;
+      gap: 20px;
+      align-items: start;
+    }
+
+    .dash-main {
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      min-width: 0;
+    }
+
+    .dash-side {
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      position: sticky;
+      top: calc(var(--header-h) + 28px);
+    }
+
+    .overview-hero {
+      padding: 28px;
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 24px;
+      align-items: center;
+    }
+
+    .overview-hero__avatar {
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      border: 2.5px solid var(--purple);
+      box-shadow: 0 0 30px rgba(155,123,255,0.20);
+      flex-shrink: 0;
+    }
+
+    .overview-hero__name {
+      font-family: 'Inter', sans-serif;
+      font-size: 22px;
+      font-weight: 800;
+      margin-bottom: 4px;
+    }
+
+    .overview-hero__tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .overview-hero__tag {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      padding: 5px 12px;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.025);
+      border: 1px solid var(--line);
+      font-family: 'Inter', sans-serif;
+      font-size: 11px;
+      color: var(--text-2);
+      font-weight: 500;
+    }
+
+    .overview-hero__tag i { width: 11px; height: 11px; }
+
+    .glass-panel { overflow: hidden; }
+
+    .glass-panel__header {
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .glass-panel__badge {
+      width: 32px;
+      height: 32px;
+      border-radius: 10px;
+      display: grid;
+      place-items: center;
+      background: rgba(155,123,255,0.08);
+      border: 1px solid rgba(155,123,255,0.18);
+      color: var(--purple);
+      font-size: 13px;
+      flex-shrink: 0;
+    }
+
+    .glass-panel__title {
+      font-family: 'Inter', sans-serif;
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .glass-panel__desc {
+      font-family: 'Inter', sans-serif;
+      font-size: 12px;
+      color: var(--text-3);
+      margin-top: 1px;
+    }
+
+    .glass-panel__body { padding: 20px; }
+
+    .proxy-stack {
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    .proxy-card { padding: 22px; transition: border-color 0.25s; }
+    .proxy-card:hover { border-color: var(--line-3); }
+
+    .proxy-card__head {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .proxy-card__icon {
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
+      display: grid;
+      place-items: center;
+      background: rgba(155,123,255,0.08);
+      border: 1px solid rgba(155,123,255,0.18);
+      color: var(--purple);
+      font-size: 15px;
+      flex-shrink: 0;
+    }
+
+    .proxy-card__title {
+      font-family: 'Inter', sans-serif;
+      font-size: 15px;
+      font-weight: 700;
+    }
+
+    .proxy-card__desc {
+      font-family: 'Inter', sans-serif;
+      font-size: 13px;
+      color: var(--text-2);
+      line-height: 1.6;
+      margin-bottom: 16px;
+    }
+
+    .field-label {
+      font-family: 'Inter', sans-serif;
+      display: block;
+      font-size: 10px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: var(--text-3);
+      margin-bottom: 7px;
+      font-weight: 700;
+    }
+
+    .field {
+      width: 100%;
+      background: rgba(0, 0, 0, 0.2);
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      font-size: 13px;
+      padding: 11px 14px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .field:focus { border-color: rgba(155,123,255,0.30); }
+    .field::placeholder { color: var(--text-3); }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 14px;
+      margin-bottom: 18px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 11px 22px;
+      border: none;
+      border-radius: 10px;
+      font-family: 'Inter', sans-serif;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.25s;
+    }
+
+    .btn i { width: 15px; height: 15px; }
+
+    .btn--p {
+      background: linear-gradient(135deg, var(--purple), var(--ice-400));
+      color: #fff;
+      border: 1px solid rgba(155,123,255,0.4);
+      box-shadow: 0 4px 20px rgba(155,123,255,0.25), inset 0 1px 0 rgba(255,255,255,0.10);
+    }
+
+    .btn--p:hover { transform: translateY(-1px); box-shadow: 0 8px 30px rgba(155,123,255,0.35), inset 0 1px 0 rgba(255,255,255,0.10); }
+
+    .btn--s {
+      background: rgba(255, 255, 255, 0.025);
+      color: var(--text-2);
+      border: 1px solid var(--line);
+    }
+
+    .btn--s:hover { border-color: var(--line-3); color: var(--text); }
+    .btn--full { width: 100%; justify-content: center; }
+
+    .terminal {
+      display: none;
+      margin-top: 16px;
+      background: rgba(0, 0, 0, 0.25);
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 16px;
+      font-family: 'Inter', sans-serif;
+      font-size: 12px;
+      color: var(--purple);
+      word-break: break-all;
+      line-height: 1.8;
+      white-space: pre-wrap;
+      position: relative;
+    }
+
+    .terminal.visible { display: block; animation: panelIn 0.2s ease; }
+
+    .terminal__copy {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      width: 26px;
+      height: 26px;
+      border-radius: 7px;
+      border: none;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--line);
+      color: var(--text-3);
+      display: grid;
+      place-items: center;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-size: 11px;
+    }
+
+    .terminal__copy:hover { border-color: var(--line-3); color: var(--text); }
+
+    .proxy-output {
+      display: none;
+      margin-top: 14px;
+      background: rgba(0, 0, 0, 0.2);
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 14px;
+      font-family: 'Inter', sans-serif;
+      font-size: 12px;
+      color: var(--purple);
+      word-break: break-all;
+    }
+
+    .proxy-output.visible { display: block; animation: panelIn 0.2s ease; }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 7px 14px;
+      border-radius: 8px;
+      font-family: 'Inter', sans-serif;
+      font-size: 12px;
+      font-weight: 600;
+      background: rgba(255, 255, 255, 0.025);
+      border: 1px solid var(--line);
+      color: var(--text-2);
+    }
+
+    .status-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--text-3);
+      flex-shrink: 0;
+    }
+
+    .status-badge.ok {
+      color: var(--green);
+      border-color: rgba(34, 224, 122, 0.15);
+      background: rgba(34, 224, 122, 0.04);
+    }
+
+    .status-badge.ok .status-dot {
+      background: var(--green);
+      animation: spulse 2s infinite;
+    }
+
+    @keyframes spulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+
+    .monitor { padding: 20px; }
+
+    .monitor__title {
+      font-family: 'Inter', sans-serif;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: var(--text-3);
+      margin-bottom: 16px;
+    }
+
+    @media (max-width: 1080px) {
+      .dash-grid { grid-template-columns: 1fr; gap: 18px; }
+      .dash-side { position: static; }
+    }
+
+    @media (max-width: 768px) {
+      .hamburger { display: none; }
+    }
+
+    .hamburger { display: none; }
+
+    @media (max-width: 768px) {
+      .sidebar {
+        display: flex;
+        position: fixed;
+        z-index: 150;
+      }
+      .main { margin-left: 0; }
+      .topbar, .workspace { padding-left: 18px; padding-right: 18px; }
+      .overview-hero { grid-template-columns: 1fr; text-align: center; }
+      .overview-hero__avatar { margin: 0 auto; }
+      .overview-hero__tags { justify-content: center; }
+
+      .hamburger {
+        display: flex;
+        position: fixed;
+        top: 14px;
+        left: 14px;
+        z-index: 200;
+        width: 40px;
+        height: 40px;
+        border-radius: 10px;
+        border: 1px solid var(--line);
+        background: rgba(3, 4, 10, 0.85);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        flex-direction: column;
+        gap: 4px;
+      }
+
+      .hamburger span {
+        display: block;
+        width: 18px;
+        height: 2px;
+        background: var(--text);
+        border-radius: 1px;
+        transition: all 0.3s;
+      }
+
+      .hamburger.open span:nth-child(1) { transform: rotate(45deg) translate(4px, 4px); }
+      .hamburger.open span:nth-child(2) { opacity: 0; }
+      .hamburger.open span:nth-child(3) { transform: rotate(-45deg) translate(4px, -4px); }
+
+      .sidebar {
+        transform: translateX(-100%);
+        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+
+      .sidebar.open { transform: translateX(0); }
+
+      .sidebar-overlay {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 99;
+      }
+
+      .sidebar-overlay.open { display: block; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="backdrop">
+    <div class="backdrop__aurora"></div>
+    <div class="backdrop__grid"></div>
+    <div class="backdrop__noise"></div>
+    <div class="backdrop__katana">⚔</div>
+  </div>
+
+  <div class="hamburger" id="hamburger" onclick="toggleSidebar()">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+  <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+
+  <aside class="sidebar">
+    <div class="sidebar__logo">
+      <div class="sidebar__logo-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+        </svg>
+      </div>
+      <div class="sidebar__logo-text">STATUS <span class="hl">HUB</span></div>
+    </div>
+
+    <nav class="sidebar__nav">
+      <button class="sidebar__link active" data-tab="home">
+        <i data-lucide="layout-dashboard"></i> Overview
+      </button>
+      <button class="sidebar__link" data-tab="webhook">
+        <i data-lucide="link-2"></i> Webhooks
+      </button>
+    </nav>
+
+    <div class="sidebar__user">
+      <img src="{{ avatar_url }}" class="sidebar__user-avatar" alt="Avatar"/>
+      <div class="sidebar__user-info">
+        <div class="sidebar__user-name">{{ user.global_name }}</div>
+        <div class="sidebar__user-tag">@{{ user.username }}</div>
+      </div>
+      <form method="POST" action="/logout" style="display: inline;">
+        <button type="submit" class="sidebar__logout" title="Log Out">
+          <i data-lucide="log-out"></i>
+        </button>
+      </form>
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="topbar">
+      <div>
+        <div class="topbar__title" id="topbar-title">Overview</div>
+        <div class="topbar__desc" id="topbar-desc">Your personal dashboard</div>
+      </div>
+    </div>
+
+    <div class="workspace">
+
+      <div class="tab-panel active" id="tab-home">
+        <div class="dash-grid">
+          <div class="dash-main">
+
+            <div class="card overview-hero">
+              <div class="katana-pattern"></div>
+              <img src="{{ avatar_url }}" class="overview-hero__avatar" alt="Avatar"/>
+              <div>
+                <div class="overview-hero__name">{{ user.global_name }}</div>
+                <div class="overview-hero__tags">
+                  <div class="overview-hero__tag"><i data-lucide="user"></i> @{{ user.username }}</div>
+                  <div class="overview-hero__tag"><i data-lucide="hash"></i> {{ user.id }}</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="card glass-panel">
+              <div class="katana-pattern"></div>
+              <div class="glass-panel__header">
+                <div class="glass-panel__badge"><i data-lucide="gamepad-2"></i></div>
+                <div>
+                  <div class="glass-panel__title">Generate Loader</div>
+                  <div class="glass-panel__desc">Enter usernames (comma separated) and generate.</div>
+                </div>
+              </div>
+              <div class="glass-panel__body">
+                <div class="form-grid">
+                  <div>
+                    <label class="field-label">Roblox Usernames</label>
+                    <input class="field" id="usernames" placeholder="user1,user2,user3"/>
+                  </div>
+                </div>
+                <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+                  <button class="btn btn--p" onclick="generateScript()">
+                    <i data-lucide="zap"></i> Generate Loader
+                  </button>
+                </div>
+                <div class="terminal" id="output-loader">
+                  <button class="terminal__copy" onclick="copyScript('output-loader')">
+                    <i data-lucide="copy"></i>
+                  </button>
+                  <span id="output-loader-text"></span>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <div class="dash-side">
+            <div class="card monitor">
+              <div class="katana-pattern"></div>
+              <div class="monitor__title">Note</div>
+              <p style="font-size: 13px; color: var(--text-2); line-height: 1.6;">
+                Make sure you enter correct usernames before generating.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="tab-panel" id="tab-webhook">
+        <div class="dash-grid">
+          <div class="dash-main">
+            <div class="proxy-stack">
+              <div class="card proxy-card">
+                <div class="katana-pattern"></div>
+                <div class="proxy-card__head">
+                  <div class="proxy-card__icon"><i data-lucide="link"></i></div>
+                  <div class="proxy-card__title">Proxy/Webhook</div>
+                </div>
+                <p class="proxy-card__desc">Secure proxies for your webhook</p>
+                <label class="field-label">Discord Webhook Link</label>
+                <input class="field" id="reg-webhook-url" placeholder="https://discord.com/api/webhooks/..." style="margin-bottom: 14px;"/>
+                <button class="btn btn--p" onclick="registerWebhook()">
+                  <i data-lucide="link"></i> Proxy
+                </button>
+                <div class="proxy-output" id="reg-out"></div>
+              </div>
+
+              <div class="card proxy-card">
+                <div class="katana-pattern"></div>
+                <div class="proxy-card__head">
+                  <div class="proxy-card__icon"><i data-lucide="refresh-cw"></i></div>
+                  <div class="proxy-card__title">Change Webhook Proxy</div>
+                </div>
+                <p class="proxy-card__desc">Edit your current webhook link (must regenerate stealers after).</p>
+                <label class="field-label">New Webhook Link</label>
+                <input class="field" id="upd-webhook-url" placeholder="https://discord.com/api/webhooks/..." style="margin-bottom: 14px;"/>
+                <button class="btn btn--p" onclick="updateWebhook()">
+                  <i data-lucide="refresh-cw"></i> Change
+                </button>
+                <div class="proxy-output" id="upd-out"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="dash-side">
+            <div class="card monitor">
+              <div class="katana-pattern"></div>
+              <div class="monitor__title">Route Integrity</div>
+              <p style="font-size: 12px; color: var(--text-2); line-height: 1.5; margin-bottom: 14px;">
+                Current registration status.
+              </p>
+              <div class="status-badge" id="statusPill">
+                <span class="status-dot"></span>
+                <span id="statusText">Checking...</span>
+              </div>
+              <div class="proxy-output" id="status-token" style="margin-top: 14px;"></div>
+              <div style="margin-top: 18px; border-top: 1px solid var(--line); padding-top: 14px;">
+                <button class="btn btn--s btn--full" onclick="checkStatus()">
+                  <i data-lucide="refresh-cw"></i> Re-verify
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <script>
+    lucide.createIcons();
+
+    function toggleSidebar() {
+      document.getElementById('hamburger').classList.toggle('open');
+      document.querySelector('.sidebar').classList.toggle('open');
+      document.getElementById('sidebarOverlay').classList.toggle('open');
+    }
+
+    const TAB_META = {
+      home:       { title: 'Overview',   desc: 'Your personal dashboard' },
+      webhook:    { title: 'Webhooks',   desc: 'Register your webhook to be protected by us and use our stealers' },
+    };
+
+    document.querySelectorAll('.sidebar__link[data-tab]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.sidebar__link').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+        btn.classList.add('active');
+        const tab = btn.dataset.tab;
+        document.getElementById('tab-' + tab).classList.add('active');
+        const meta = TAB_META[tab];
+        if (meta) {
+          document.getElementById('topbar-title').textContent = meta.title;
+          document.getElementById('topbar-desc').textContent = meta.desc;
+        }
+        if (tab === 'webhook') checkStatus();
+        lucide.createIcons();
+      });
+    });
+
+    async function generateScript() {
+      const loader = document.getElementById('output-loader');
+      const text = document.getElementById('output-loader-text');
+      const usernames = document.getElementById('usernames').value.trim();
+      text.textContent = 'Compiling build configurations...';
+      loader.classList.add('visible');
+      if (!usernames) {
+        text.textContent = 'Missing usernames.';
+        return;
+      }
+      try {
+        const r = await fetch('/api/generate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ usernames }),
+        });
+        const d = await r.json();
+        if (d.error) {
+          text.textContent = 'Error: ' + d.error;
+          return;
+        }
+        text.textContent = d.script;
+        lucide.createIcons();
+      } catch (e) {
+        text.textContent = 'Error: ' + e.message;
+      }
+    }
+
+    function copyScript(id) {
+      const el = document.getElementById(id);
+      const t = el.querySelector('span[id$="-text"]') || el;
+      navigator.clipboard.writeText(t.textContent).catch(() => {});
+    }
+
+    async function registerWebhook() {
+      const out = document.getElementById('reg-out');
+      const url = document.getElementById('reg-webhook-url').value.trim();
+      if (!url) {
+        out.textContent = 'Missing webhook URL.';
+        out.classList.add('visible');
+        return;
+      }
+      out.textContent = 'Registering...';
+      out.classList.add('visible');
+      try {
+        const r = await fetch('/api/webhook/register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ webhook_url: url }),
+        });
+        const d = await r.json();
+        if (d.error) {
+          out.textContent = 'Error: ' + d.error;
+          return;
+        }
+        out.textContent = 'Registered. Token: ' + d.token;
+        lucide.createIcons();
+      } catch (e) {
+        out.textContent = 'Error: ' + e.message;
+      }
+    }
+
+    async function updateWebhook() {
+      const out = document.getElementById('upd-out');
+      const url = document.getElementById('upd-webhook-url').value.trim();
+      if (!url) {
+        out.textContent = 'Missing webhook URL.';
+        out.classList.add('visible');
+        return;
+      }
+      out.textContent = 'Updating...';
+      out.classList.add('visible');
+      try {
+        const r = await fetch('/api/webhook/update', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ webhook_url: url }),
+        });
+        const d = await r.json();
+        if (d.error) {
+          out.textContent = 'Error: ' + d.error;
+          return;
+        }
+        out.textContent = 'Updated. Token: ' + d.token;
+        lucide.createIcons();
+      } catch (e) {
+        out.textContent = 'Error: ' + e.message;
+      }
+    }
+
+    async function checkStatus() {
+      const pill = document.getElementById('statusPill');
+      const text = document.getElementById('statusText');
+      const tokenOut = document.getElementById('status-token');
+      text.textContent = 'Checking...';
+      try {
+        const r = await fetch('/api/webhook/status');
+        const d = await r.json();
+        if (d.registered) {
+          pill.className = 'status-badge ok';
+          text.textContent = 'Active Registry Verified';
+          tokenOut.innerHTML = '';
+          tokenOut.classList.remove('visible');
+        } else {
+          pill.className = 'status-badge';
+          text.textContent = 'Unallocated Endpoint';
+          tokenOut.innerHTML = '';
+          tokenOut.classList.remove('visible');
+        }
+      } catch (e) {
+        pill.className = 'status-badge';
+        text.textContent = 'Handshake Timeout';
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      lucide.createIcons();
+    });
+  </script>
+</body>
+</html>
